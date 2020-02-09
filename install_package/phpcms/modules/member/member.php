@@ -11,7 +11,6 @@ pc_base::load_app_class('admin', 'admin', 0);
 pc_base::load_sys_class('format', '', 0);
 pc_base::load_sys_class('form', '', 0);
 pc_base::load_app_func('util', 'content');
-pc_base::load_app_func('global');
 
 class member extends admin {
 
