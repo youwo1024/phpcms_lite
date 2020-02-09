@@ -83,28 +83,28 @@ function safe_replace($string) {
  * @param $string
  * @return string
  */
-function remove_xss($string) { 
+function remove_xss($string) {
     $string = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S', '', $string);
 
     $parm1 = Array('javascript', 'vbscript', 'expression', 'applet', 'meta', 'xml', 'blink', 'link', 'script', 'embed', 'object', 'iframe', 'frame', 'frameset', 'ilayer', 'layer', 'bgsound', 'title', 'base');
 
     $parm2 = Array('onabort', 'onactivate', 'onafterprint', 'onafterupdate', 'onbeforeactivate', 'onbeforecopy', 'onbeforecut', 'onbeforedeactivate', 'onbeforeeditfocus', 'onbeforepaste', 'onbeforeprint', 'onbeforeunload', 'onbeforeupdate', 'onblur', 'onbounce', 'oncellchange', 'onchange', 'onclick', 'oncontextmenu', 'oncontrolselect', 'oncopy', 'oncut', 'ondataavailable', 'ondatasetchanged', 'ondatasetcomplete', 'ondblclick', 'ondeactivate', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onerrorupdate', 'onfilterchange', 'onfinish', 'onfocus', 'onfocusin', 'onfocusout', 'onhelp', 'onkeydown', 'onkeypress', 'onkeyup', 'onlayoutcomplete', 'onload', 'onlosecapture', 'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onmove', 'onmoveend', 'onmovestart', 'onpaste', 'onpropertychange', 'onreadystatechange', 'onreset', 'onresize', 'onresizeend', 'onresizestart', 'onrowenter', 'onrowexit', 'onrowsdelete', 'onrowsinserted', 'onscroll', 'onselect', 'onselectionchange', 'onselectstart', 'onstart', 'onstop', 'onsubmit', 'onunload');
 
-    $parm = array_merge($parm1, $parm2); 
+    $parm = array_merge($parm1, $parm2);
 
-	for ($i = 0; $i < sizeof($parm); $i++) { 
-		$pattern = '/'; 
-		for ($j = 0; $j < strlen($parm[$i]); $j++) { 
-			if ($j > 0) { 
-				$pattern .= '('; 
-				$pattern .= '(&#[x|X]0([9][a][b]);?)?'; 
-				$pattern .= '|(&#0([9][10][13]);?)?'; 
-				$pattern .= ')?'; 
+	for ($i = 0; $i < sizeof($parm); $i++) {
+		$pattern = '/';
+		for ($j = 0; $j < strlen($parm[$i]); $j++) {
+			if ($j > 0) {
+				$pattern .= '(';
+				$pattern .= '(&#[x|X]0([9][a][b]);?)?';
+				$pattern .= '|(&#0([9][10][13]);?)?';
+				$pattern .= ')?';
 			}
-			$pattern .= $parm[$i][$j]; 
+			$pattern .= $parm[$i][$j];
 		}
 		$pattern .= '/i';
-		$string = preg_replace($pattern, ' ', $string); 
+		$string = preg_replace($pattern, ' ', $string);
 	}
 	return $string;
 }
@@ -309,7 +309,7 @@ function string2array($data) {
 */
 function array2string($data, $isformdata = 1) {
 	if($data == '' || empty($data)) return '';
-	
+
 	if($isformdata) $data = new_stripslashes($data);
 	if(strtolower(CHARSET)=='gbk'){
 		$data = mult_iconv("GBK", "UTF-8", $data);
@@ -967,33 +967,17 @@ function get_memberinfo_buyusername($username, $field='') {
 }
 
 /**
- * 获取用户头像，建议传入phpssouid
- * @param $uid 默认为phpssouid
- * @param $is_userid $uid是否为v9 userid，如果为真，执行sql查询此用户的phpssouid
+ * 获取用户头像
+ * @param $userid 用户ID
  * @param $size 头像大小 有四种[30x30 45x45 90x90 180x180] 默认30
  */
-function get_memberavatar($uid, $is_userid='', $size='30') {
-	if($is_userid) {
-		$db = pc_base::load_model('member_model');
-		$memberinfo = $db->get_one(array('userid'=>$uid));
-		if(isset($memberinfo['phpssouid'])) {
-			$uid = $memberinfo['phpssouid'];
-		} else {
-			return false;
-		}
-	}
-
-	pc_base::load_app_class('client', 'member', 0);
-	define('APPID', pc_base::load_config('system', 'phpsso_appid'));
-	$phpsso_api_url = pc_base::load_config('system', 'phpsso_api_url');
-	$phpsso_auth_key = pc_base::load_config('system', 'phpsso_auth_key');
-	$client = new client($phpsso_api_url, $phpsso_auth_key);
-	$avatar = $client->ps_getavatar($uid);
-	if(isset($avatar[$size])) {
-		return $avatar[$size];
-	} else {
-		return false;
-	}
+function get_memberavatar($userid, $size='30') {
+    //根据用户id创建文件夹
+    $dir1 = ceil($userid / 10000);
+    $dir2 = ceil($userid % 10000 / 1000);
+    $url = pc_base::load_config('system','upload_url').'avatar/'.$dir1.'/'.$dir2.'/'.$userid.'/';
+    $avatar = array('180'=>$url.'180x180.jpg', '90'=>$url.'90x90.jpg', '45'=>$url.'45x45.jpg', '30'=>$url.'30x30.jpg');
+    return $avatar[$size];
 }
 
 /**
@@ -1038,7 +1022,7 @@ function menu_linkage($linkageid = 0, $id = 'linkid', $defaultvalue = 0) {
 		$string .=$s;
 		$string .= ')';
 		$string .= '</script>';
-		
+
 	} elseif($datas['style']=='2') {
 		if(!defined('LINKAGE_INIT_1')) {
 			define('LINKAGE_INIT_1', 1);
@@ -1071,7 +1055,7 @@ function menu_linkage($linkageid = 0, $id = 'linkid', $defaultvalue = 0) {
 							$ld5.eq(index).show();								}
 					})
 		</script>';
-			
+
 	} else {
 		$title = $defaultvalue ? $infos[$defaultvalue]['name'] : $datas['title'];
 		$colObj = random(3).date('is');
@@ -1790,5 +1774,5 @@ function get_vid($contentid = 0, $catid = 0, $isspecial = 0) {
 		return $minite.":".$secend;
 	}
 
- } 
+ }
 ?>

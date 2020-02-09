@@ -90,7 +90,7 @@ body fieldset table th{ font-weight:normal; line-height:28px}
 .err_info span{color:#fff;}
 </style>
 </head>
-<body>	
+<body>
 	<div class="body_box">
         <div class="main_box">
             <div class="hd">
@@ -107,10 +107,9 @@ body fieldset table th{ font-weight:normal; line-height:28px}
 							<ul>
 								<li><a href="<?php echo $url?>index.php?m=admin&c=index" title="后台管理" class="htgl">后台管理</a></li>
 							</ul>
-						</div>					
+						</div>
 						<div class="txt_c">
 						<span style="margin-right:8px;">*</span>安装完毕请登录后台生成首页，更新缓存<br/>
-						<span style="margin-right:8px;">*</span>默认phpcms管理员密码与phpsso管理员密码相同<br/>
 						<span style="margin-right:8px;">*</span>为了您站点的安全，安装完成后即可将网站根目录下的“install”文件夹删除。</div>
                      </div>
                     </div>

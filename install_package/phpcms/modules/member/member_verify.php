@@ -8,13 +8,12 @@ pc_base::load_app_class('admin', 'admin', 0);
 pc_base::load_sys_class('format', '', 0);
 
 class member_verify extends admin {
-	
+
 	private $db, $member_db;
-	
+
 	function __construct() {
 		parent::__construct();
 		$this->db = pc_base::load_model('member_verify_model');
-		$this->_init_phpsso();
 	}
 
 	/**
@@ -24,7 +23,7 @@ class member_verify extends admin {
 
 		include $this->admin_tpl('member_init');
 	}
-	
+
 	/**
 	 * member list
 	 */
@@ -37,18 +36,18 @@ class member_verify extends admin {
 		$member_model = getcache('member_model', 'commons');
 		include $this->admin_tpl('member_verify');
 	}
-	
+
 	function modelinfo() {
 		$userid = !empty($_GET['userid']) ? intval($_GET['userid']) : showmessage(L('illegal_parameters'), HTTP_REFERER);
 		$modelid = !empty($_GET['modelid']) ? intval($_GET['modelid']) : showmessage(L('illegal_parameters'), HTTP_REFERER);
-		
+
 		$memberinfo = $this->db->get_one(array('userid'=>$userid));
 		//模型字段名称
 		$this->member_field_db = pc_base::load_model('sitemodel_field_model');
 		$model_fieldinfo = $this->member_field_db->select(array('modelid'=>$modelid), "*", 100);
 		//用户模型字段信息
 		$member_fieldinfo = string2array($memberinfo['modelinfo']);
-		
+
 		//交换数组key值
 		foreach($model_fieldinfo as $v) {
 			if(array_key_exists($v['field'], $member_fieldinfo)) {
@@ -61,7 +60,7 @@ class member_verify extends admin {
 
 		include $this->admin_tpl('member_verify_modelinfo');
 	}
-		
+
 	/**
 	 * pass member
 	 */
@@ -72,48 +71,37 @@ class member_verify extends admin {
 			$where = to_sqls($uidarr, '', 'userid');
 			$userarr = $this->db->listinfo($where);
 			$success_uids = $info = array();
-			
-			foreach($userarr as $v) {
-				$status = $this->client->ps_member_register($v['username'], $v['password'], $v['email'], $v['regip'], $v['encrypt']);
-				if ($status > 0) {
-					$info['phpssouid'] = $status;
-					$info['password'] = password($v['password'], $v['encrypt']);
-					$info['regdate'] = $info['lastdate'] = $v['regdate'];
-					$info['username'] = $v['username'];
-					$info['nickname'] = $v['nickname'];
-					$info['email'] = $v['email'];
-					$info['regip'] = $v['regip'];
-					$info['point'] = $v['point'];
-					$info['groupid'] = $this->_get_usergroup_bypoint($v['point']);
-					$info['amount'] = $v['amount'];
-					$info['encrypt'] = $v['encrypt'];
-					$info['modelid'] = $v['modelid'] ? $v['modelid'] : 10;
-					if($v['mobile']) $info['mobile'] = $v['mobile'];
-					$userid = $this->member_db->insert($info, 1);
 
-					if($v['modelinfo']) {	//如果数据模型不为空
-						//插入会员模型数据
-						$user_model_info = string2array($v['modelinfo']);
-						$user_model_info['userid'] = $userid;
-						$this->member_db->set_model($info['modelid']);
-						$this->member_db->insert($user_model_info);
-					}
-					
-					if($userid) {
-						$success_uids[] = $v['userid'];
-					}
+			foreach($userarr as $v) {
+				$info['password'] = password($v['password'], $v['encrypt']);
+				$info['regdate'] = $info['lastdate'] = $v['regdate'];
+				$info['username'] = $v['username'];
+				$info['nickname'] = $v['nickname'];
+				$info['email'] = $v['email'];
+				$info['regip'] = $v['regip'];
+				$info['point'] = $v['point'];
+				$info['groupid'] = $this->_get_usergroup_bypoint($v['point']);
+				$info['amount'] = $v['amount'];
+				$info['encrypt'] = $v['encrypt'];
+				$info['modelid'] = $v['modelid'] ? $v['modelid'] : 10;
+				if($v['mobile']) $info['mobile'] = $v['mobile'];
+				$userid = $this->member_db->insert($info, 1);
+
+				if($v['modelinfo']) {	//如果数据模型不为空
+					//插入会员模型数据
+					$user_model_info = string2array($v['modelinfo']);
+					$user_model_info['userid'] = $userid;
+					$this->member_db->set_model($info['modelid']);
+					$this->member_db->insert($user_model_info);
+				}
+
+				if($userid) {
+					$success_uids[] = $v['userid'];
 				}
 			}
-			$where = to_sqls($success_uids, '', 'userid');			
+			$where = to_sqls($success_uids, '', 'userid');
 			$this->db->update(array('status'=>1, 'message'=>$_POST['message']), $where);
-			
-			//phpsso注册失败的用户状态直接置为审核期间phpsso已注册该会员
-			$fail_uids = array_diff($uidarr, $success_uids);
-			if (!empty($fail_uids)) {
-				$where = to_sqls($fail_uids, '', 'userid');
-				$this->db->update(array('status'=>5, 'message'=>$_POST['message']), $where);
-			}
-			
+
 			//发送 email通知
 			if($_POST['sendemail']) {
 				$memberinfo = $this->db->select($where);
@@ -122,13 +110,13 @@ class member_verify extends admin {
 					sendmail($v['email'], L('reg_pass'), $_POST['message']);
 				}
 			}
-			
+
 			showmessage(L('pass').L('operation_success'), HTTP_REFERER);
 		} else {
 			showmessage(L('operation_failure'), HTTP_REFERER);
 		}
 	}
-	
+
 	/**
 	 * delete member
 	 */
@@ -138,7 +126,7 @@ class member_verify extends admin {
 			$message = stripslashes($_POST['message']);
 			$where = to_sqls($uidarr, '', 'userid');
 			$this->db->delete($where);
-						
+
 			showmessage(L('delete').L('operation_success'), HTTP_REFERER);
 		} else {
 			showmessage(L('operation_failure'), HTTP_REFERER);
@@ -163,7 +151,7 @@ class member_verify extends admin {
 					}
 				}
 			}
-			
+
 			showmessage(L('reject').L('operation_success'), HTTP_REFERER);
 		} else {
 			showmessage(L('operation_failure'), HTTP_REFERER);
@@ -174,7 +162,7 @@ class member_verify extends admin {
 	 * ignore member
 	 */
 	function ignore() {
-		if(isset($_POST['userid'])) {		
+		if(isset($_POST['userid'])) {
 			$uidarr = isset($_POST['userid']) ? $_POST['userid'] : showmessage(L('illegal_parameters'), HTTP_REFERER);
 			$where = to_sqls($uidarr, '', 'userid');
 			$res = $this->db->update(array('status'=>2, 'message'=>$_POST['message']), $where);
@@ -193,7 +181,7 @@ class member_verify extends admin {
 			showmessage(L('operation_failure'), HTTP_REFERER);
 		}
 	}
-		
+
 	/*
 	 * change password
 	 */
@@ -208,7 +196,7 @@ class member_verify extends admin {
 		$passwordinfo = password($password);
 		return $this->db->update($passwordinfo,array('userid'=>$userid));
 	}
-	
+
 	private function _checkuserinfo($data, $is_edit=0) {
 		if(!is_array($data)){
 			showmessage(L('need_more_param'));return false;
@@ -221,14 +209,14 @@ class member_verify extends admin {
 		}
 		return $data;
 	}
-		
+
 	private function _checkpasswd($password){
 		if (!is_password($password)){
 			return false;
 		}
 		return true;
 	}
-	
+
 	private function _checkname($username) {
 		$username =  trim($username);
 		if ($this->db->get_one(array('username'=>$username))){
@@ -236,7 +224,7 @@ class member_verify extends admin {
 		}
 		return true;
 	}
-	
+
 	/**
 	 *根据积分算出用户组
 	 * @param $point int 积分数
@@ -248,7 +236,7 @@ class member_verify extends admin {
 			$point = $member_setting['defualtpoint'] ? $member_setting['defualtpoint'] : 0;
 		}
 		$grouplist = getcache('grouplist');
-		
+
 		foreach ($grouplist as $k=>$v) {
 			$grouppointlist[$k] = $v['point'];
 		}
@@ -268,63 +256,49 @@ class member_verify extends admin {
 		}
 		return $groupid;
 	}
-	
-	/**
-	 * 初始化phpsso
-	 * about phpsso, include client and client configure
-	 * @return string phpsso_api_url phpsso地址
-	 */
-	private function _init_phpsso() {
-		pc_base::load_app_class('client', '', 0);
-		define('APPID', pc_base::load_config('system', 'phpsso_appid'));
-		$phpsso_api_url = pc_base::load_config('system', 'phpsso_api_url');
-		$phpsso_auth_key = pc_base::load_config('system', 'phpsso_auth_key');
-		$this->client = new client($phpsso_api_url, $phpsso_auth_key);
-		return $phpsso_api_url;
-	}
-	
+
 	/**
 	 * check uername status
 	 */
 	public function checkname_ajax() {
 		$username = isset($_GET['username']) && trim($_GET['username']) ? trim($_GET['username']) : exit(0);
-		$username = iconv('utf-8', CHARSET, $username);
-		
-		$status = $this->client->ps_checkname($username);
-		if($status == -4) {	//deny_register
+		if(CHARSET != 'utf-8') {
+			$username = iconv('utf-8', CHARSET, $username);
+			$username = addslashes($username);
+		}
+
+		//首先判断会员审核表
+		$verify_db = pc_base::load_model('member_verify_model');
+		if($verify_db->get_one(array('username'=>$username))) {
 			exit('0');
 		}
-		
-		$status = $this->client->ps_get_member_info($username, 2);
-		if (is_array($status)) {
+
+		//判断会员表
+		if ($this->db->get_one(array('username'=>$username))) {
 			exit('0');
-		} else {
-			exit('1');
 		}
+
+		exit('1');
 	}
-	
+
 	/**
 	 * check email status
 	 */
 	public function checkemail_ajax() {
 		$email = isset($_GET['email']) && trim($_GET['email']) ? trim($_GET['email']) : exit(0);
-		
-		$status = $this->client->ps_checkemail($email);
-		if($status == -5) {	//deny_register
+
+		//首先判断会员审核表
+		$verify_db = pc_base::load_model('member_verify_model');
+		if($verify_db->get_one(array('email'=>$email))) {
 			exit('0');
-		}
-				
-		$status = $this->client->ps_get_member_info($email, 3);
-		if(isset($_GET['phpssouid']) && isset($status['uid'])) {
-			if ($status['uid'] == intval($_GET['phpssouid'])) {
-				exit('1');
-			}
 		}
 
-		if (is_array($status)) {
+		//判断会员表
+		if ($r = $this->db->get_one(array('email'=>$email))) {
+			if (isset($_GET['userid']) && $_GET['userid'] == $r['userid']) {
+				exit('1');
+			}
 			exit('0');
-		} else {
-			exit('1');
 		}
 	}
 }

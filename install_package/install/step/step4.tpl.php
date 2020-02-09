@@ -10,7 +10,6 @@
                     <div class="l"></div>
                     <div class="ct_box nobrd i6v">
                     <div class="nr">
-					<?php if($reg_sso_status=='') {?>
 	 				<table cellpadding="0" cellspacing="0" class="table_list">
                   <tr>
                     <th class="col1">目录文件</th>
@@ -25,11 +24,6 @@
                   </tr>
 					<?php } ?>
                 </table>
-				<?php } else { ?>
-				<div class="err_info">
-				<?php echo $reg_sso_status?><br/>
-				<span>请点击“上一步”按钮，重新填写。</span>
-				<?php } ?>
 				</div>
  					</div>
                     </div>
@@ -47,8 +41,7 @@
 			<input type="hidden" name="step" value="5">
 			<input type="hidden" id="selectmod" name="selectmod" value="<?php echo $selectmod?>" />
 			<input type="hidden" name="testdata" value="<?php echo $testdata?>" />
-			<input type="hidden" id="install_phpsso" name="install_phpsso" value="<?php echo $install_phpsso?>" />
-			
+
 			</form>
         </div>
     </div>
