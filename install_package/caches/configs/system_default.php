@@ -49,9 +49,6 @@ return array(
 'sina_akey' => '',	//sina AKEY
 'sina_skey' => '',	//sina SKEY
 
-'qq_akey' => '',	//qq skey
-'qq_skey' => '',	//qq skey
-
 'qq_appkey' => '',	//QQ号码登录 appkey
 'qq_appid' => '',	//QQ号码登录 appid
 'qq_callback' => '',	//QQ号码登录 callback

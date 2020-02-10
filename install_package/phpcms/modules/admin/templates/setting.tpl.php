@@ -163,14 +163,6 @@ include $this->admin_tpl('header');?>
 	App secret key <input type="text" class="input-text" name="setconfig[sina_skey]" id="sina_skey" size="40" value="<?php echo $sina_skey ?>"/> <a href="http://open.t.sina.com.cn/wiki/index.php/<?php echo L('connect_micro')?>" target="_blank"><?php echo L('click_register')?></a>
 	</td>
   </tr>
-
-  <tr>
-    <th><?php echo L('setting_connect_qq')?></th>
-    <td class="y-bg">
-	App key <input type="text" class="input-text" name="setconfig[qq_akey]" id="qq_akey" size="20" value="<?php echo $qq_akey ?>"/>
-	App secret key <input type="text" class="input-text" name="setconfig[qq_skey]" id="qq_skey" size="40" value="<?php echo $qq_skey ?>"/> <a href="http://open.t.qq.com/" target="_blank"><?php echo L('click_register')?></a>
-	</td>
-  </tr>
   <tr>
     <th><?php echo L('setting_connect_qqnew')?></th>
     <td class="y-bg">

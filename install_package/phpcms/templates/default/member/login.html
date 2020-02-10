@@ -116,10 +116,6 @@ $(function(){
                         {if $setting['sina_akey'] || $setting['sina_skey']}
                             <li><a href="javascript:;" onclick="show_login('sina');return false;" style="background-image:url({IMG_PATH}member/logo/sina_16_16.png)">新浪微博登录</a></li>
                         {/if}
-
-						{if $setting['qq_akey'] || $setting['qq_skey']}
-                        	<li style="margin-right:14px;"><a href="javascript:;" onclick="show_login('qq');return false;" style="background-image:url({IMG_PATH}member/logo/qq_16_16.png)">腾讯微博登录</a></li>
-						{/if}
 						{if $setting['qq_appkey'] || $setting['qq_appid']}
                         	<li style="margin-right:14px;"><a href="{APP_PATH}index.php?m=member&c=index&a=public_qq_loginnew" target="_blank" style="background-image:url({IMG_PATH}member/logo/qq_16_16.png)">腾讯QQ登录</a></li>
 						{/if}
