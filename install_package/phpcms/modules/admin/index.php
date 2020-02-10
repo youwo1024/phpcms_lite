@@ -275,29 +275,6 @@ class index extends admin {
 	}
 
 	/**
-	 *
-	 * 读取盛大接扣获取appid和secretkey
-	 */
-	public function public_snda_status() {
-		//引入盛大接口
-		if(!strstr(pc_base::load_config('snda','snda_status'), '|')) {
-			$this->site_db = pc_base::load_model('site_model');
-			$uuid_arr = $this->site_db->get_one(array('siteid'=>1), 'uuid');
-			$uuid = $uuid_arr['uuid'];
-			$snda_check_url = "http://open.sdo.com/phpcms?cmsid=".$uuid."&sitedomain=".$_SERVER['SERVER_NAME'];
-
-			$snda_res_json = @file_get_contents($snda_check_url);
-			$snda_res = json_decode($snda_res_json, 1);
-
-			if(!isset($snda_res[err]) && !empty($snda_res['appid'])) {
-				$appid = $snda_res['appid'];
-				$secretkey = $snda_res['secretkey'];
-				set_config(array('snda_status'=>$appid.'|'.$secretkey), 'snda');
-			}
-		}
-	}
-
-	/**
 	 * @设置网站模式 设置了模式后，后台仅出现在此模式中的菜单
 	 */
 	public function public_set_model() {

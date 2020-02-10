@@ -150,7 +150,6 @@ $LANG['ban'] = 'Disable';
 $LANG['submit'] = 'Submit';
 $LANG['need_subscribe'] = 'Apply to get this function';
 $LANG['click_apply'] = 'Click to apply';
-$LANG['snda_register_notice'] = 'Note: time for examination and approval is 1-3 days. Please fill in APPID after passing the review (By default, function is closed if APPID is empty.)';
 $LANG['connect_micro'] = 'Connect to miniblog';
 $LANG['click_register'] = 'Click to register';
 $LANG['general'] = 'Normal';

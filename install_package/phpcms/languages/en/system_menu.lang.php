@@ -290,7 +290,7 @@ $LANG['comment_check'] = 'Comment reviewing';
 $LANG['comment_list'] = 'A list of comments';
 
 $LANG['link_setting'] = 'Model settings';
-$LANG['connect_config'] = 'SNDA connect';
+$LANG['connect_config'] = 'connect';
 $LANG['view_modelinfo'] = 'View model info';
 
 $LANG['link'] = 'Partner links';

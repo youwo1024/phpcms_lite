@@ -729,22 +729,14 @@ class index extends foreground {
 
 	public function logout() {
 		$setting = pc_base::load_config('system');
-		//snda退出
-		if($setting['snda_enable'] && param::get_cookie('_from')=='snda') {
-			param::set_cookie('_from', '');
-			$forward = isset($_GET['forward']) && trim($_GET['forward']) ? urlencode($_GET['forward']) : '';
-			$logouturl = 'https://cas.sdo.com/cas/logout?url='.urlencode(APP_PATH.'index.php?m=member&c=index&a=logout&forward='.$forward);
-			header('Location: '.$logouturl);
-		} else {
-			param::set_cookie('auth', '');
-			param::set_cookie('_userid', '');
-			param::set_cookie('_username', '');
-			param::set_cookie('_groupid', '');
-			param::set_cookie('_nickname', '');
-			param::set_cookie('cookietime', '');
-			$forward = isset($_GET['forward']) && trim($_GET['forward']) ? $_GET['forward'] : 'index.php?m=member&c=index&a=login';
-			showmessage(L('logout_success'), $forward);
-		}
+		param::set_cookie('auth', '');
+		param::set_cookie('_userid', '');
+		param::set_cookie('_username', '');
+		param::set_cookie('_groupid', '');
+		param::set_cookie('_nickname', '');
+		param::set_cookie('cookietime', '');
+		$forward = isset($_GET['forward']) && trim($_GET['forward']) ? $_GET['forward'] : 'index.php?m=member&c=index&a=login';
+		showmessage(L('logout_success'), $forward);
 	}
 
 	/**
@@ -831,7 +823,6 @@ class index extends foreground {
 		   define('SITEID', $siteid);
 		}
 
-		$snda_enable = pc_base::load_config('system', 'snda_enable');
 		include template('member', 'mini');
 	}
 
@@ -1127,78 +1118,6 @@ class index extends foreground {
 			include template('member', 'connect_sina');
 		}
 	}
-
-	/**
-	 * 盛大通行证登陆
-	 */
-	public function public_snda_login() {
-		define('SNDA_AKEY', pc_base::load_config('system', 'snda_akey'));
-		define('SNDA_SKEY', pc_base::load_config('system', 'snda_skey'));
-		define('SNDA_CALLBACK', urlencode(APP_PATH.'index.php?m=member&c=index&a=public_snda_login&callback=1'));
-
-		pc_base::load_app_class('OauthSDK', '' ,0);
-		$this->_session_start();
-		if(isset($_GET['callback']) && trim($_GET['callback'])) {
-
-			$o = new OauthSDK(SNDA_AKEY, SNDA_SKEY, SNDA_CALLBACK);
-			$code = $_REQUEST['code'];
-			$accesstoken = $o->getAccessToken($code);
-
-			if(is_numeric($accesstoken['sdid'])) {
-				$userid = $accesstoken['sdid'];
-			} else {
-				showmessage(L('login_failure'), 'index.php?m=member&c=index&a=login');
-			}
-
-			if(!empty($userid)) {
-
-				//检查connect会员是否绑定，已绑定直接登录，未绑定提示注册/绑定页面
-				$where = array('connectid'=>$userid, 'from'=>'snda');
-				$r = $this->db->get_one($where);
-
-				//connect用户已经绑定本站用户
-				if(!empty($r)) {
-					//读取本站用户信息，执行登录操作
-					$password = $r['password'];
-					$userid = $r['userid'];
-					$groupid = $r['groupid'];
-					$username = $r['username'];
-					$nickname = empty($r['nickname']) ? $username : $r['nickname'];
-					$this->db->update(array('lastip'=>ip(), 'lastdate'=>SYS_TIME, 'nickname'=>$me['name']), array('userid'=>$userid));
-					if(!$cookietime) $get_cookietime = param::get_cookie('cookietime');
-					$_cookietime = $cookietime ? intval($cookietime) : ($get_cookietime ? $get_cookietime : 0);
-					$cookietime = $_cookietime ? TIME + $_cookietime : 0;
-
-					$phpcms_auth = sys_auth($userid."\t".$password, 'ENCODE', get_auth_key('login'));
-
-					param::set_cookie('auth', $phpcms_auth, $cookietime);
-					param::set_cookie('_userid', $userid, $cookietime);
-					param::set_cookie('_username', $username, $cookietime);
-					param::set_cookie('_groupid', $groupid, $cookietime);
-					param::set_cookie('cookietime', $_cookietime, $cookietime);
-					param::set_cookie('_nickname', $nickname, $cookietime);
-					param::set_cookie('_from', 'snda');
-					$forward = isset($_GET['forward']) && !empty($_GET['forward']) ? $_GET['forward'] : 'index.php?m=member&c=index';
-					showmessage(L('login_success'), $forward);
-				} else {
-					//弹出绑定注册页面
-					$_SESSION = array();
-					$_SESSION['connectid'] = $userid;
-					$_SESSION['from'] = 'snda';
-					$connect_username = $userid;
-					include template('member', 'connect');
-				}
-			}
-		} else {
-			$o = new OauthSDK(SNDA_AKEY, SNDA_SKEY, SNDA_CALLBACK);
-			$accesstoken = $o->getSystemToken();
-			$aurl = $o->getAuthorizeURL();
-
-			include template('member', 'connect_snda');
-		}
-
-	}
-
 
 	/**
 	 * QQ号码登录

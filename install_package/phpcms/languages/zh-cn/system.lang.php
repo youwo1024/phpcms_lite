@@ -150,7 +150,6 @@ $LANG['ban'] = '禁止';
 $LANG['submit'] = '提交';
 $LANG['need_subscribe'] = '需申请开通该功能';
 $LANG['click_apply'] = '点击申请';
-$LANG['snda_register_notice'] = '注意：审核时间为1-3个工作日，请通过审核后填写APPID，APPID为空则功能关闭';
 $LANG['connect_micro'] = '连接微博';
 $LANG['click_register'] = '点击注册';
 $LANG['general'] = '一般';

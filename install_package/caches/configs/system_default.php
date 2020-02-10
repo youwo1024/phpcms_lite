@@ -49,9 +49,6 @@ return array(
 'sina_akey' => '',	//sina AKEY
 'sina_skey' => '',	//sina SKEY
 
-'snda_akey' => '',	//盛大通行证 akey
-'snda_skey' => '',	//盛大通行证 skey
-
 'qq_akey' => '',	//qq skey
 'qq_skey' => '',	//qq skey
 
