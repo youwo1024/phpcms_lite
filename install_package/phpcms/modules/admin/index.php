@@ -3,6 +3,8 @@ defined('IN_PHPCMS') or exit('No permission resources.');
 pc_base::load_app_class('admin','admin',0);
 
 class index extends admin {
+	private $db, $menu_db, $panel_db;
+
 	public function __construct() {
 		parent::__construct();
 		$this->db = pc_base::load_model('admin_model');
@@ -137,13 +139,13 @@ class index extends admin {
 		$datas = admin::admin_menu($menuid);
 		if (isset($_GET['parentid']) && $parentid = intval($_GET['parentid']) ? intval($_GET['parentid']) : 10) {
 			foreach($datas as $_value) {
-	        	if($parentid==$_value['id']) {
-	        		echo '<li id="_M'.$_value['id'].'" class="on top_menu"><a href="javascript:_M('.$_value['id'].',\'?m='.$_value['m'].'&c='.$_value['c'].'&a='.$_value['a'].'\')" hidefocus="true" style="outline:none;">'.L($_value['name']).'</a></li>';
+				if($parentid==$_value['id']) {
+					echo '<li id="_M'.$_value['id'].'" class="on top_menu"><a href="javascript:_M('.$_value['id'].',\'?m='.$_value['m'].'&c='.$_value['c'].'&a='.$_value['a'].'\')" hidefocus="true" style="outline:none;">'.L($_value['name']).'</a></li>';
 
-	        	} else {
-	        		echo '<li id="_M'.$_value['id'].'" class="top_menu"><a href="javascript:_M('.$_value['id'].',\'?m='.$_value['m'].'&c='.$_value['c'].'&a='.$_value['a'].'\')"  hidefocus="true" style="outline:none;">'.L($_value['name']).'</a></li>';
-	        	}
-	        }
+				} else {
+					echo '<li id="_M'.$_value['id'].'" class="top_menu"><a href="javascript:_M('.$_value['id'].',\'?m='.$_value['m'].'&c='.$_value['c'].'&a='.$_value['a'].'\')"  hidefocus="true" style="outline:none;">'.L($_value['name']).'</a></li>';
+				}
+			}
 		} else {
 			include $this->admin_tpl('left');
 		}
@@ -210,12 +212,12 @@ class index extends admin {
 		$adminpanel = $this->panel_db->select(array('userid'=>$userid), '*',20 , 'datetime');
 		$product_copyright = '酷溜网(北京)科技有限公司';
 		$programmer = '马玉辉、张明雪、李天会、潘兆志';
- 		$designer = '张二强';
-		ob_start();
+		$designer = '张二强';
+		// ob_start();
 		include $this->admin_tpl('main');
-		$data = ob_get_contents();
-		ob_end_clean();
-		system_information($data);
+		// $data = ob_get_contents();
+		// ob_end_clean();
+		// system_information($data);
 	}
 	/**
 	 * 维持 session 登陆状态
@@ -267,8 +269,8 @@ class index extends admin {
 		 $array = admin::admin_menu(0);
 		 $menu = array();
 		 foreach ($array as $k=>$v) {
-		 	$menu[$v['id']] = $v;
-		 	$menu[$v['id']]['childmenus'] = admin::admin_menu($v['id']);
+			$menu[$v['id']] = $v;
+			$menu[$v['id']]['childmenus'] = admin::admin_menu($v['id']);
 		 }
 		 $show_header = true;
 		 include $this->admin_tpl('map');
@@ -293,7 +295,7 @@ class index extends admin {
 		$where = array('parentid'=>0,'display'=>1);
 		if ($model) {
 			$where[$model] = 1;
- 		}
+		}
 		$result =$menudb->select($where,'id',1000,'listorder ASC');
 		$menuids = array();
 		if (is_array($result)) {
