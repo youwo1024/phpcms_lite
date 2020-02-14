@@ -425,4 +425,3 @@ $LANG['comment_manage'] = '评论管理';
 $LANG['sys_setting'] = '设置';
 $LANG['module'] = '模块';
 $LANG['a_clean_data'] = '一键清理数据';
-?>
